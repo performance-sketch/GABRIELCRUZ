@@ -5,8 +5,10 @@ const PULS_ORDEM=['PRETA','BRANCA','AMARELA','VERDE']; // pulseira atribuida em 
 const _R=(typeof REZDY!=='undefined')?REZDY:{gerado_em:null,hoje:null,voos_hoje:[],semana:[],mes:{voos:0,horas:0,pax:0}};
 // roteiro = produto(s) Rezdy do horario; ROTEIROS montado a partir deles para manter a mesma estrutura das telas
 const ROTEIROS={};
+// nome curto do produto Rezdy: 'Doors off | 30min (GYG)' -> '30 Doors off'
+function nomeProduto(n){const m=(n||'').match(/(\d+)\s*min/i),on=/doors[\s-]*on/i.test(n);return m?`${m[1]} Doors ${on?'on':'off'}`:n}
 const VOOS=_R.voos_hoje.map((s,i)=>{const rot=s.produtos.join(' + ');ROTEIROS[rot]={nome:rot,min:s.min};
- return{hora:s.hora,voo:'VR'+(101+i),pulseira:PULS_ORDEM[i%4],rot,pax:s.pax,min:s.min,receita:s.receita,bookings:s.bookings,capacidade:s.capacidade,livres:s.livres}});
+ return{hora:s.hora,voo:'VR'+(101+i),pulseira:PULS_ORDEM[i%4],rot,prod:[...new Set(s.produtos.map(nomeProduto))].join(' + '),pax:s.pax,min:s.min,receita:s.receita,bookings:s.bookings,capacidade:s.capacidade,livres:s.livres}});
 const hm=s=>{const[a,b]=s.split(':').map(Number);return a*60+b};
 const fmtHM=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(Math.floor(m%60)).padStart(2,'0');
 const param=k=>new URLSearchParams(location.search).get(k);
