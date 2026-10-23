@@ -800,7 +800,6 @@ if(typeof module!=='undefined'){ module.exports={ENCERRAMENTO_REF:ENCERRAMENTO_R
     var info=$('rezdyInfo'); info.hidden=false;
     info.textContent = s ? 'Rezdy: voo '+pf.voo+' das '+s.hora+' · '+s.produtos.join(' + ')+' · '+s.pax+' pax · '+s.bookings.length+' reservas ('+s.bookings.map(function(b){return b.order;}).join(', ')+')'+(pf.status?' · status '+pf.status:'')
                          : 'Voo '+pf.voo+' não encontrado nos voos de hoje da Rezdy'+(hora?'; horário vindo do iPad: '+hora:'')+'. Confira antes de falar.';
-    if(!s) info.style.color='#d93025';
   })();
   verificaSessao(); /* a chave nunca vem ao navegador; o cookie de sessão é HttpOnly */
 })();

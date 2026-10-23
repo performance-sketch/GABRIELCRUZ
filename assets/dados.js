@@ -1,5 +1,4 @@
 // DADOS REAIS DA REZDY (assets/rezdy_dados.js, gerado a cada 15 min pelo GitHub Actions)
-// O que a Rezdy NAO fornece aparece em vermelho e negrito (classe .falta) e no quadro "NÃO VEM DA REZDY".
 const PULSEIRAS={PRETA:'#1c1c1e',BRANCA:'#f4f2ee',AMARELA:'#f5c400',VERDE:'#2e9d4f'};
 const PULS_ORDEM=['PRETA','BRANCA','AMARELA','VERDE']; // pulseira em rodizio pelo hub (nao existe na Rezdy); pode ser trocada na TV escritorio
 const _R=(typeof REZDY!=='undefined')?REZDY:{gerado_em:null,hoje:null,voos_hoje:[],semana:[],mes:{voos:0,horas:0,pax:0}};
@@ -42,6 +41,5 @@ const CLIMA_HORA=null, CLIMA_SEMANA=null;
 const SEM_COR={verde:'#2e9d4f',amarelo:'#f5c400',vermelho:'#c62828'};
 const brl=n=>'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const FALTA=t=>`<b class="falta">${t}</b>`;
-// selo de origem + quadro do que nao foi puxado da Rezdy (?limpo=1 esconde o quadro)
-function marcaOrigem(faltas){const a=document.querySelector('.amostra');if(a){const g=_R.gerado_em?_R.gerado_em.slice(11,16):'--:--';a.textContent=_R.gerado_em?`DADOS REZDY · ATUALIZADO ${g}`:'SEM DADOS DA REZDY';if(!_R.gerado_em)a.classList.add('falta')}
- if(!faltas||!faltas.length||param('limpo'))return;const d=document.createElement('div');d.className='faltas';d.innerHTML='<b>NÃO VEM DA REZDY</b>'+faltas.map(f=>`<span>${f}</span>`).join('');document.body.appendChild(d)}
+// selo de origem dos dados (a lista do que nao vem da Rezdy fica no README)
+function marcaOrigem(faltas){const a=document.querySelector('.amostra');if(a){const g=_R.gerado_em?_R.gerado_em.slice(11,16):'--:--';a.textContent=_R.gerado_em?`DADOS REZDY · ATUALIZADO ${g}`:'SEM DADOS DA REZDY';if(!_R.gerado_em)a.classList.add('falta')}}

@@ -8,8 +8,4 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text"
 .placa-logo img{height:48px;display:block}
 @keyframes entra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 button{font-family:inherit}
-/* o que a Rezdy nao fornece: vermelho e negrito */
-.falta{color:#d93025!important;font-weight:800!important}
-.faltas{position:fixed;right:28px;bottom:56px;max-width:560px;background:#fff;border:3px solid #d93025;border-radius:16px;padding:12px 18px;z-index:98;color:#d93025;font-weight:800;font-size:15px;line-height:1.45;box-shadow:0 8px 30px rgba(0,0,0,.18)}
-.faltas b{display:block;font-size:13px;letter-spacing:.14em;margin-bottom:4px}.faltas span{display:block}
 a.placa-logo{cursor:pointer;text-decoration:none;transition:opacity .2s}a.placa-logo:hover{opacity:.75}
