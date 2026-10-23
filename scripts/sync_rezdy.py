@@ -44,6 +44,7 @@ agora = datetime.now(TZ)
 hoje = agora.date()
 seg = hoje - timedelta(days=hoje.weekday())
 dom = seg + timedelta(days=6)
+ate = max(dom, hoje + timedelta(days=7))  # proximos 7 dias
 inicio = min(hoje.replace(day=1), seg)
 
 # produtos: duração por código
@@ -56,7 +57,7 @@ bookings, off = [], 0
 while True:
     pg = get("bookings", {
         "minTourStartTime": f"{inicio}T00:00:00-03:00",
-        "maxTourStartTime": f"{dom}T23:59:59-03:00",
+        "maxTourStartTime": f"{ate}T23:59:59-03:00",
         "limit": 100, "offset": off,
     }).get("bookings") or []
     bookings += pg
@@ -120,12 +121,14 @@ for v in todos:
 agora_s = agora.strftime("%Y-%m-%d %H:%M")
 mes = [v for v in todos if v["data"][:7] == str(hoje)[:7] and f"{v['data']} {v['hora']}" <= agora_s]
 semana = [v for v in todos if str(seg) <= v["data"] <= str(dom)]
+proximos = [v for v in todos if str(hoje) < v["data"] <= str(ate)]
 
 dados = {
     "gerado_em": agora.isoformat(timespec="minutes"),
     "hoje": str(hoje),
     "voos_hoje": voos_hoje,
     "semana": semana,
+    "proximos": proximos,
     "mes": {
         "voos": len(mes),
         "horas": round(sum(v["min"] for v in mes) / 60, 1),
