@@ -40,8 +40,8 @@ td{border-bottom:1px solid #f0f0f3;font-weight:500}
 <div class="leg">Receita líquida = receita bruta menos taxas da reserva menos custo do fretamento Helinews (minutos de voo x R$/hora da faixa).</div></div>
 <div><h2>TABELA HELINEWS (R$/HORA)</h2><table class="hn"><thead><tr><th>HORAS NO MÊS</th><th>R$/HORA</th></tr></thead><tbody id="hn"></tbody></table><div class="prem" id="pm"></div></div></div>
 <div class="amostra">DADOS DE EXEMPLO</div>
-<script src="assets/rezdy_dados.js"></script>
-<script src="assets/dados.js"></script>
+<script>// sempre a versao mais nova (o GitHub Pages guarda cache por 10 min)
+var _t=Date.now();document.write('<script src="assets/rezdy_dados.js?t='+_t+'"><\/script><script src="assets/dados.js?t='+_t+'"><\/script>')</script>
 <script>
 const f=faixa(HORAS_MES),taxa=TAXAS.plataforma+TAXAS.cartao,n=x=>x.toLocaleString('pt-BR');
 // valores financeiros nao sao publicados (repositorio publico): tudo em R$ aparece como NAO PUBLICADO

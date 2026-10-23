@@ -50,8 +50,8 @@ h2{font-size:20px;letter-spacing:.14em;color:var(--suave);font-weight:600}
 <div id="menu" onclick="if(event.target===this)fechaMenu()"><div class="cx"><h3 id="mt"></h3><div id="mo"></div><button class="auto" onclick="fechaMenu()">Cancelar</button></div></div>
 <div class="dots"><i></i><i></i><i></i></div>
 <div class="amostra">DADOS DE EXEMPLO</div>
-<script src="assets/rezdy_dados.js"></script>
-<script src="assets/dados.js"></script>
+<script>// sempre a versao mais nova (o GitHub Pages guarda cache por 10 min)
+var _t=Date.now();document.write('<script src="assets/rezdy_dados.js?t='+_t+'"><\/script><script src="assets/dados.js?t='+_t+'"><\/script>')</script>
 <script>
 const agora=agoraRio();document.getElementById('rel').textContent=fmtHM(agora);setInterval(()=>document.getElementById('rel').textContent=fmtHM(agoraRio()),10000);setTimeout(()=>location.reload(),5*60*1000);const T=['AGENDA DO DIA','CLIMA E VOOS','INDICADORES DO MÊS'];
 const SBG={'CONFIRMADO':'#e6f4ea','CHECK-IN ABERTO':'#f0f0f3','BRIEFING DE SEGURANÇA':'#e3eefc','EQUIPANDO':'#fdebdc','EMBARQUE':'#fdf3c4','DECOLOU':'#e6f4ea'};
