@@ -1,0 +1,62 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Vertical Rio Hub | Financeiro (restrito)</title>
+<link rel="stylesheet" href="assets/base.css">
+<style>
+header{height:120px;display:flex;align-items:center;justify-content:space-between;padding:0 60px;border-bottom:4px solid var(--tinta)}
+.placa-logo{padding:0}.placa-logo img{height:56px}h1{font-size:44px;letter-spacing:3px}
+.restr{background:var(--tinta);color:#fff;font-size:22px;font-weight:800;padding:10px 20px;border-radius:8px;letter-spacing:2px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;padding:30px 60px 10px}
+.k{border:3px solid var(--linha);border-radius:16px;padding:22px 26px}.k span{font-size:22px;color:var(--suave);font-weight:800;letter-spacing:2px}.k b{display:block;font-size:50px;font-weight:900;margin-top:6px;white-space:nowrap}.k small{font-size:20px;color:#555}
+.k.liq{background:var(--tinta);color:#fff;border-color:var(--tinta)}.k.liq span,.k.liq small{color:#cfcdcd}
+.neg{color:var(--erro)}
+.corpo{display:grid;grid-template-columns:1fr 470px;gap:36px;padding:16px 60px}
+table{width:100%;border-collapse:collapse;font-size:21px;font-variant-numeric:tabular-nums}
+th{text-align:right;font-size:18px;color:var(--suave);letter-spacing:2px;padding:7px 10px;border-bottom:3px solid var(--tinta)}th:nth-child(-n+3){text-align:left}
+td{padding:5px 8px;white-space:nowrap;border-bottom:1px solid var(--linha);text-align:right;font-weight:600}td:nth-child(-n+3){text-align:left}
+.bl{display:inline-block;width:34px;height:22px;border-radius:4px;vertical-align:middle;margin-right:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+h2{font-size:26px;letter-spacing:2px;margin-bottom:10px}
+.hn td{font-size:24px}.hn tr.at td{background:var(--tinta);color:#fff;font-weight:800}
+.prem{margin-top:14px;font-size:20px;font-weight:700;background:#fff6cc;border-left:8px solid var(--atencao);padding:12px 16px;line-height:1.35}
+.leg{font-size:18px;color:#555;margin-top:10px;line-height:1.4}
+
+header{height:130px;border-bottom:none;padding:0 70px}
+h1{font-size:40px;font-weight:600}
+.restr{background:var(--card);color:var(--tinta);font-size:15px;font-weight:600;letter-spacing:.1em;border-radius:999px;padding:10px 20px}
+.kpis{padding:10px 70px 20px;gap:20px}
+.k{border:none;background:var(--card);border-radius:24px;padding:26px 28px}.k span{font-size:15px;letter-spacing:.14em;font-weight:600}.k b{font-size:48px;font-weight:700;letter-spacing:-.03em}.k small{font-size:16px;color:var(--suave)}
+.k.liq{background:var(--tinta)}
+.corpo{padding:16px 70px}
+h2{font-size:16px;letter-spacing:.14em;color:var(--suave);font-weight:600}
+th{border-bottom:1px solid var(--linha);font-size:14px;font-weight:600;letter-spacing:.12em}
+td{border-bottom:1px solid #f0f0f3;font-weight:500}
+.hn tr.at td{background:var(--tinta);color:#fff}.hn tr.at td:first-child{border-radius:12px 0 0 12px}.hn tr.at td:last-child{border-radius:0 12px 12px 0}
+.prem{background:#fdf6d8;border-left:none;border-radius:16px;font-weight:500;font-size:17px;padding:16px 20px}.prem br+*{}
+.neg{color:var(--erro)}
+.bl{border-radius:6px;box-shadow:none}
+
+</style></head><body>
+<header><div style="display:flex;align-items:center;gap:36px"><div class="placa-logo"><img src="assets/logo_vertical_rio.svg" alt="Vertical Rio"></div><h1>FINANCEIRO DO DIA</h1></div><div class="restr">ACESSO RESTRITO: PERFIL FINANCEIRO (SIMULAÇÃO)</div></header>
+<div class="kpis" id="kp"></div>
+<div class="corpo"><div><h2 id="rt">RESULTADO POR VOO</h2><table><thead><tr><th>HORA</th><th>VOO</th><th>ROTEIRO</th><th>PAX</th><th>RECEITA BRUTA</th><th>TAXAS</th><th>CUSTO HELINEWS</th><th>RECEITA LÍQUIDA</th></tr></thead><tbody id="tb"></tbody></table>
+<div class="leg">Receita líquida = receita bruta menos taxas da reserva menos custo do fretamento Helinews (minutos de voo x R$/hora da faixa).</div></div>
+<div><h2>TABELA HELINEWS (R$/HORA)</h2><table class="hn"><thead><tr><th>HORAS NO MÊS</th><th>R$/HORA</th></tr></thead><tbody id="hn"></tbody></table><div class="prem" id="pm"></div></div></div>
+<div class="amostra">DADOS DE EXEMPLO</div>
+<script src="assets/rezdy_dados.js"></script>
+<script src="assets/dados.js"></script>
+<script>
+const f=faixa(HORAS_MES),taxa=TAXAS.plataforma+TAXAS.cartao,n=x=>x.toLocaleString('pt-BR');
+// valores financeiros nao sao publicados (repositorio publico): tudo em R$ aparece como NAO PUBLICADO
+const SEM_VALOR=!VOOS.some(v=>'receita' in v),money=SEM_VALOR?()=>FALTA('NÃO PUBLICADO'):brl;
+document.getElementById('rt').textContent='RESULTADO POR VOO, '+dataCurta();
+const L=VOOS.map(v=>{const b=v.receita||0,t=b*taxa/100,c=v.min/60*f[2];return{...v,b,t,c,l:b-t-c}});
+const S=k=>L.reduce((a,v)=>a+v[k],0),pax=S('pax'),div=(a,b)=>b?a/b:0;
+document.getElementById('kp').innerHTML=`
+<div class="k"><span>RECEITA BRUTA</span><b>${money(S('b'))}</b><small>${L.length} voos, ${pax} passageiros</small></div>
+<div class="k"><span>TAXAS DA RESERVA</span><b class="falta">${money(S('t'))}</b><small class="falta">ESTIMADO: ${n(taxa)}% fixo, a Rezdy não informa</small></div>
+<div class="k"><span>CUSTO HELINEWS</span><b>${money(S('c'))}</b><small>${(S('min')/60).toLocaleString('pt-BR',{maximumFractionDigits:1})} h x ${money(f[2])}/h</small></div>
+<div class="k liq"><span>RECEITA LÍQUIDA</span><b>${money(S('l'))}</b><small>margem ${SEM_VALOR?FALTA('NÃO PUBLICADO'):(div(S('l'),S('b'))*100).toFixed(1).replace('.',',')+'%'}</small></div>
+<div class="k"><span>TICKET MÉDIO</span><b>${money(div(S('b'),pax))}</b><small>por passageiro; ${money(div(S('b'),L.length))} por voo</small></div>`;
+document.getElementById('tb').innerHTML=L.map(v=>`<tr><td>${v.hora}</td><td><span class="bl" style="background:${PULSEIRAS[v.pulseira]}"></span>${FALTA(v.voo)}</td><td>${ROTEIROS[v.rot].nome} (${v.min} min)<br><small style="color:var(--suave);font-size:14px">${v.bookings.map(b=>b.order+(b.cortesia?' (cortesia)':'')).join(' · ')}</small></td><td>${v.pax}</td><td>${money(v.b)}</td><td class="falta">${money(v.t)}</td><td>${money(v.c)}</td><td class="${v.l<0&&!SEM_VALOR?'neg':''}" style="font-weight:800">${money(v.l)}</td></tr>`).join('')||'<tr><td colspan=8>Sem voos na Rezdy para hoje</td></tr>';
+document.getElementById('hn').innerHTML=HELINEWS.map(x=>`<tr class="${x===f?'at':''}"><td>${x[3]}${x===f?' (faixa atual)':''}</td><td>${money(x[2])}</td></tr>`).join('');
+document.getElementById('pm').innerHTML=`Mês até agora: ${n(HORAS_MES)} h voadas <span class="falta">(estimado)</span>, ${VOOS_MES} voos, faixa ${f[3]}.<br>PREMISSA A CONFIRMAR: a tarifa da faixa atual vale para todas as horas do mês (não escalonada).<br>Receita bruta = subtotal Rezdy das reservas ativas (inclui extras); cortesias (pagamento FREE) contam R$ 0.`;
+marcaOrigem([...(SEM_VALOR?['Valores financeiros: não publicados (repositório público)']:[]),'Taxas de plataforma e cartão: % fixo estimado (6,5% + 3,2%)','Código do voo (VR101, VR102…): gerado pelo hub, a Rezdy só tem horário e produto','Horas voadas: estimadas pela duração do produto, não pelo tempo real de voo','Pulseira: cor atribuída em rodízio pelo hub']);
+</script></body></html>
