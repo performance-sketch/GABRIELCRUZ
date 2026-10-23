@@ -55,6 +55,7 @@ header{height:150px;border-bottom:none;padding:0 80px}
 .amostra{color:#f5f5f7}
 /* order numbers */
 body.poucos #poucos{grid-template-columns:1fr 760px}
+.info{margin-top:44px;display:flex;flex-direction:column;gap:34px}.stv{font-size:60px;font-weight:600;margin-top:8px;letter-spacing:.01em}.pulv{display:flex;align-items:center;gap:24px;font-size:60px;font-weight:600;margin-top:10px}.pulv .bloco{width:120px;height:72px;border-radius:16px}
 .hvoo{font-size:240px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums}
 .cd{margin-top:40px}.cdnum{font-size:120px}
 .ords{background:rgba(255,255,255,.04);border-radius:32px;padding:36px 44px;align-self:start}.lista{margin-top:16px}
@@ -82,7 +83,7 @@ let lang=IDIOMAS.includes(param('idioma'))?param('idioma'):'pt';
 const TX={
  pt:{res:'RESERVAS',decEm:'DECOLAGEM EM',decAg:'DECOLANDO',tit:'PARTIDAS',h:['HORA','VOO','PULSEIRA','STATUS'],st:s=>s,cor:c=>c,prox:'PRÓXIMO VOO',dec:'Decolagem',embEm:'EMBARQUE EM',embAg:'EMBARQUE AGORA',dep:'Depois',pul:'PULSEIRA',nada:'SEM MAIS VOOS HOJE',rod:'Confira a cor da sua pulseira.',rodEmb:(v,c)=>`Embarque ${v}: pulseira ${c}.`,rodP:c=>`Passageiros com pulseira ${c}, aguardem a chamada.`},
  en:{res:'BOOKINGS',decEm:'DEPARTURE IN',decAg:'DEPARTING NOW',tit:'DEPARTURES',h:['TIME','FLIGHT','WRISTBAND','STATUS'],st:s=>STATUS_EN[s],cor:c=>({PRETA:'BLACK',BRANCA:'WHITE',AMARELA:'YELLOW',VERDE:'GREEN'})[c],prox:'NEXT FLIGHT',dec:'Departure',embEm:'BOARDING IN',embAg:'BOARDING NOW',dep:'Later',pul:'WRISTBAND',nada:'NO MORE FLIGHTS TODAY',rod:'Check your wristband color.',rodEmb:(v,c)=>`Boarding ${v}: ${c} wristband.`,rodP:c=>`${c} wristband passengers, please wait for the call.`},
- es:{res:'RESERVAS',decEm:'DESPEGUE EN',decAg:'DESPEGANDO',tit:'SALIDAS',h:['HORA','VUELO','PULSERA','ESTADO'],st:s=>({'CHECK-IN ABERTO':'CHECK-IN ABIERTO','BRIEFING DE SEGURANÇA':'BRIEFING DE SEGURIDAD','EQUIPANDO':'EQUIPÁNDOSE','EMBARQUE':'EMBARQUE'})[s],cor:c=>({PRETA:'NEGRA',BRANCA:'BLANCA',AMARELA:'AMARILLA',VERDE:'VERDE'})[c],prox:'PRÓXIMO VUELO',dec:'Despegue',embEm:'EMBARQUE EN',embAg:'EMBARQUE AHORA',dep:'Después',pul:'PULSERA',nada:'NO HAY MÁS VUELOS HOY',rod:'Verifique el color de su pulsera.',rodEmb:(v,c)=>`Embarque ${v}: pulsera ${c}.`,rodP:c=>`Pasajeros con pulsera ${c}, esperen el llamado.`}};
+ es:{res:'RESERVAS',decEm:'DESPEGUE EN',decAg:'DESPEGANDO',tit:'SALIDAS',h:['HORA','VUELO','PULSERA','ESTADO'],st:s=>({'CONFIRMADO':'CONFIRMADO','DECOLOU':'DESPEGÓ','CHECK-IN ABERTO':'CHECK-IN ABIERTO','BRIEFING DE SEGURANÇA':'BRIEFING DE SEGURIDAD','EQUIPANDO':'EQUIPÁNDOSE','EMBARQUE':'EMBARQUE'})[s],cor:c=>({PRETA:'NEGRA',BRANCA:'BLANCA',AMARELA:'AMARILLA',VERDE:'VERDE'})[c],prox:'PRÓXIMO VUELO',dec:'Despegue',embEm:'EMBARQUE EN',embAg:'EMBARQUE AHORA',dep:'Después',pul:'PULSERA',nada:'NO HAY MÁS VUELOS HOY',rod:'Verifique el color de su pulsera.',rodEmb:(v,c)=>`Embarque ${v}: pulsera ${c}.`,rodP:c=>`Pasajeros con pulsera ${c}, esperen el llamado.`}};
 const ALF='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-';
 const forcar=param('modo')==='poucos';
 let agora=agoraRio();
@@ -116,14 +117,13 @@ function ordens(v,t){return `<div class="ords"><div class="rot">${t.res} · ${v.
 function renderPoucos(f){cabecalho();const t=TX[lang];const el=document.getElementById('poucos');const v=f[0];
  document.getElementById('rod').textContent='';
  if(!v){el.innerHTML=`<div><div class="rot">${t.nada}</div></div>`;return}
- // contagem regressiva ate a decolagem (h:mm:ss quando falta mais de 1 hora)
- let seg=Math.max(0,Math.round((hm(v.hora)-agora)*60));const h=Math.floor(seg/3600),p2=n=>String(n).padStart(2,'0');
- const cd=(h?h+':':'')+p2(Math.floor(seg%3600/60))+':'+p2(seg%60);
+ const mk=param('limpo')?'':'falta';
  el.innerHTML=`<div><div class="rot">${t.prox}</div><div class="hvoo">${v.hora}</div>
- <div class="cd"><div class="rot">${seg>0?t.decEm:t.decAg}</div><div class="cdnum">${cd}</div></div></div>
+ <div class="info"><div><div class="rot">${t.h[3]}</div><div class="stv" style="color:${COR_ST[v.st]}">${t.st(v.st)}</div></div>
+ <div><div class="rot">${t.pul}</div><div class="pulv"><span class="bloco" style="background:${PULSEIRAS[v.pulseira]};${v.pulseira==='PRETA'?'box-shadow:0 0 0 2px rgba(255,255,255,.35)':''}"></span><span class="${mk}">${t.cor(v.pulseira)}</span></div></div></div></div>
  ${ordens(v,t)}`;
 }
-marcaOrigem([]); // tudo nesta tela vem da Rezdy
+marcaOrigem(['Pulseira: cor atribuída em rodízio pelo hub','Status do voo: automático pelo horário ou definido na TV Escritório / iPad']);
 setTimeout(()=>location.reload(),5*60*1000); // puxa dados novos da Rezdy
 window.addEventListener("storage",e=>{if(e.key==="vrhub_status")render()});
 render();

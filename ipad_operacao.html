@@ -47,7 +47,7 @@ h1{font-size:24px;font-weight:600;letter-spacing:.02em}.rel{font-size:36px;font-
 <script src="assets/dados.js"></script>
 <script>
 const ORDEM=STATUS;
-const BG={'CHECK-IN ABERTO':'#f0f0f3','BRIEFING DE SEGURANÇA':'#e3eefc','EQUIPANDO':'#fdebdc','EMBARQUE':'#fdf3c4'};
+const BG={'CONFIRMADO':'#e6f4ea','CHECK-IN ABERTO':'#f0f0f3','BRIEFING DE SEGURANÇA':'#e3eefc','EQUIPANDO':'#fdebdc','EMBARQUE':'#fdf3c4'};
 const agora=agoraRio();setInterval(()=>document.getElementById('rel').textContent=fmtHM(agoraRio()),10000);
 const ov=()=>JSON.parse(localStorage.getItem('vrhub_status')||'{}');
 const notas=JSON.parse(localStorage.getItem('vrhub_notas')||'{}');

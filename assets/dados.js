@@ -16,12 +16,16 @@ const DIA_REF=_R.hoje?new Date(_R.hoje+'T12:00:00-03:00'):new Date();
 const dataLonga=()=>{const s=DIA_REF.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'America/Sao_Paulo'}).replace('-feira','');return s.charAt(0).toUpperCase()+s.slice(1)};
 const dataCurta=()=>DIA_REF.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',timeZone:'America/Sao_Paulo'}).replace('.','').replace(',','').toUpperCase();
 const mesNome=()=>DIA_REF.toLocaleDateString('pt-BR',{month:'long',timeZone:'America/Sao_Paulo'});
-const STATUS=['CHECK-IN ABERTO','BRIEFING DE SEGURANÇA','EQUIPANDO','EMBARQUE'];
-const STATUS_EN={'CHECK-IN ABERTO':'CHECK-IN OPEN','BRIEFING DE SEGURANÇA':'SAFETY BRIEFING','EQUIPANDO':'GEARING UP','EMBARQUE':'BOARDING'};
+const STATUS=['CONFIRMADO','CHECK-IN ABERTO','BRIEFING DE SEGURANÇA','EQUIPANDO','EMBARQUE'];
+const STATUS_TODOS=[...STATUS,'DECOLOU']; // opcoes do seletor manual
+const STATUS_EN={'CONFIRMADO':'CONFIRMED','DECOLOU':'DEPARTED','CHECK-IN ABERTO':'CHECK-IN OPEN','BRIEFING DE SEGURANÇA':'SAFETY BRIEFING','EQUIPANDO':'GEARING UP','EMBARQUE':'BOARDING'};
 // status operacional: automatico pelo horario, sobrescrito pelo iPad (a Rezdy nao tem esse fluxo)
-function statusDe(v,agora){const t=hm(v.hora);if(agora>=t)return'DECOLOU';if(agora>=t-15)return'EMBARQUE';if(agora>=t-30)return'EQUIPANDO';if(agora>=t-45)return'BRIEFING DE SEGURANÇA';return'CHECK-IN ABERTO'}
-const COR_ST={'CHECK-IN ABERTO':'#f4f2ee','BRIEFING DE SEGURANÇA':'#4fa3ff','EQUIPANDO':'#f07d1a','EMBARQUE':'#f5c400','DECOLOU':'#86dc9b'};
-const COR_ST_CLARO={'CHECK-IN ABERTO':'#ebeaea','BRIEFING DE SEGURANÇA':'#a9d0ff','EQUIPANDO':'#ffc48f','EMBARQUE':'#f5c400','DECOLOU':'#86dc9b'};
+function statusDe(v,agora){const t=hm(v.hora);if(agora>=t)return'DECOLOU';if(agora>=t-15)return'EMBARQUE';if(agora>=t-30)return'EQUIPANDO';if(agora>=t-45)return'BRIEFING DE SEGURANÇA';if(agora>=t-60)return'CHECK-IN ABERTO';return'CONFIRMADO'}
+// status manual (TV escritorio / iPad) fica no navegador; zera a cada dia porque os codigos VR101... sao refeitos diariamente
+try{if(_R.hoje&&localStorage.getItem('vrhub_dia')!==_R.hoje){localStorage.removeItem('vrhub_status');localStorage.removeItem('vrhub_notas');localStorage.setItem('vrhub_dia',_R.hoje)}}catch(e){}
+function setStatus(voo,st){try{const o=JSON.parse(localStorage.getItem('vrhub_status')||'{}');if(st)o[voo]=st;else delete o[voo];localStorage.setItem('vrhub_status',JSON.stringify(o))}catch(e){}}
+const COR_ST={'CONFIRMADO':'#b7e4c7','CHECK-IN ABERTO':'#f4f2ee','BRIEFING DE SEGURANÇA':'#4fa3ff','EQUIPANDO':'#f07d1a','EMBARQUE':'#f5c400','DECOLOU':'#86dc9b'};
+const COR_ST_CLARO={'CONFIRMADO':'#cdeed8','CHECK-IN ABERTO':'#ebeaea','BRIEFING DE SEGURANÇA':'#a9d0ff','EQUIPANDO':'#ffc48f','EMBARQUE':'#f5c400','DECOLOU':'#86dc9b'};
 // tabela contratual Helinews (fixa, nao vem da Rezdy)
 const HELINEWS=[[0,40,9750,'até 40h'],[41,50,9150,'41 a 50h'],[51,60,8950,'51 a 60h'],[61,70,8500,'61 a 70h'],[71,80,7850,'71 a 80h'],[81,90,7500,'81 a 90h'],[91,100,7400,'91 a 100h'],[101,1e9,7350,'acima de 101h']];
 // horas = soma da duracao dos produtos de cada horario ja realizado no mes (estimativa: a Rezdy nao registra o tempo real de voo)
