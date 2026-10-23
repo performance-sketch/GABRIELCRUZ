@@ -65,7 +65,7 @@ document.getElementById('nao').onclick=()=>{pend=null;document.getElementById('d
 document.getElementById('sim').onclick=()=>{
  if(pend.tipo==='status'){const o=ov();o[pend.voo]=pend.prox;localStorage.setItem('vrhub_status',JSON.stringify(o))} // so atualiza as TVs, sem anuncio
  else{const v=VOOS.find(x=>x.voo===pend.voo);notas[pend.voo]=`Anúncio enviado à Central de Avisos (simulação): ${st(v)}`;localStorage.setItem('vrhub_notas',JSON.stringify(notas));
-  const t=document.getElementById('toast');t.textContent=`${pend.voo}: anúncio enviado à Central de Avisos (simulação)`;t.style.display='block';setTimeout(()=>t.style.display='none',4000);if(!param('demo'))location.href=`central_avisos.html?voo=${encodeURIComponent(v.voo)}&pulseira=${encodeURIComponent(v.pulseira)}&status=${encodeURIComponent(st(v))}`}
+  const t=document.getElementById('toast');t.textContent=`${pend.voo}: anúncio enviado à Central de Avisos (simulação)`;t.style.display='block';setTimeout(()=>t.style.display='none',4000);if(!param('demo'))location.href=`central_avisos.html?voo=${encodeURIComponent(v.voo)}&pulseira=${encodeURIComponent(v.pulseira)}&status=${encodeURIComponent(st(v))}&hora=${encodeURIComponent(v.hora)}`}
  document.getElementById('dlg').classList.remove('on');pend=null;render()};
 function anunciar(voo){const v=VOOS.find(x=>x.voo===voo);pend={voo,tipo:'anuncio'};
  document.getElementById('pq').textContent=`Anunciar o voo ${voo.replace('VR','VR ')} (pulseira ${v.pulseira}, ${st(v)}) na Central de Avisos?`;document.getElementById('dlg').classList.add('on')}

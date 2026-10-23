@@ -131,6 +131,7 @@
       <div class="cores" id="cores" role="group" aria-label="Cor da pulseira"></div>
       <button class="sec" id="gerar" type="button">Gerar chamada de voo</button>
     </div>
+    <p class="dica" id="rezdyInfo" hidden></p>
   </section>
 
   <button id="falar" type="button">Falar</button>
@@ -191,9 +192,11 @@ if(u.indexOf('/api/sessao')>=0||u.indexOf('/api/login')>=0||u.indexOf('/api/logo
 if(u.indexOf('/api/translate')>=0){var q=[].concat(c.q||[]);return J({data:{translations:q.map(function(t){return{translatedText:t}})}})}
 if(u.indexOf('/api/tts')>=0){try{var s=new SpeechSynthesisUtterance(c.texto||'');s.lang='pt-BR';s.rate=c.velocidade||1;speechSynthesis.speak(s)}catch(e){}return J({audioContent:SIL})}
 return of.apply(this,arguments)};
-var p=new URLSearchParams(location.search);window.__VR_PREFILL={voo:p.get('voo'),pulseira:p.get('pulseira'),status:p.get('status')};
+var p=new URLSearchParams(location.search);window.__VR_PREFILL={voo:p.get('voo'),pulseira:p.get('pulseira'),status:p.get('status'),hora:p.get('hora')};
 document.addEventListener('DOMContentLoaded',function(){var d=document.createElement('div');d.textContent='AMBIENTE DE TESTE  |  voz do navegador, sem servidor'+(p.get('voo')?'  |  voo '+p.get('voo')+', pulseira '+(p.get('pulseira')||'')+', '+(p.get('status')||''):'');d.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#f5c400;color:#231F20;font:600 13px system-ui;text-align:center;padding:6px';document.body.appendChild(d);var a=document.createElement('a');a.href='index.html';a.textContent='Voltar ao Hub';a.style.cssText='position:fixed;bottom:12px;left:12px;z-index:99999;background:#231F20;color:#fff;padding:8px 14px;border-radius:20px;font:600 13px system-ui;text-decoration:none';document.body.appendChild(a)});
-})();</script><script id="logica">
+})();</script><script>// voos do dia (Rezdy) para preencher a chamada vinda do iPad
+document.write('<script src="assets/rezdy_dados.js?t='+Date.now()+'"><\/script>')</script>
+<script id="logica">
 /* ===== LÓGICA PURA (testável sem navegador) ===== */
 var IDIOMAS = [
   {c:'pt', nome:'Português', rot:'PT', tts:'pt-BR', tr:'pt', html:'pt-BR'},
@@ -786,6 +789,19 @@ if(typeof module!=='undefined'){ module.exports={ENCERRAMENTO_REF:ENCERRAMENTO_R
   $('tema').onclick=function(){ var n=!document.body.classList.contains('noite'); gravar(LS.tema, n?'noite':'claro'); aplicaTema(n); };
   desenhaSelect(); $('texto').value = modeloSel().textos.pt;
   desenhaIdiomas(); desenhaCores();
+  /* veio do iPad (?voo=VR101&pulseira=PRETA&status=...): preenche a chamada de voo com o horário da Rezdy */
+  (function(){ var pf=window.__VR_PREFILL||{}; if(!pf.voo && !pf.hora) return;
+    var R=(typeof REZDY!=='undefined')?REZDY:null, i=parseInt(String(pf.voo||'').replace(/\D/g,''),10)-101, s=R&&R.voos_hoje?R.voos_hoje[i]:null;
+    var hora=(s&&s.hora)||pf.hora||'';
+    if(pf.pulseira){ var c=corPorPt(String(pf.pulseira).toLowerCase()); if(c){ estado.cor=c; desenhaCores(); } }
+    if(hora) $('hora').value=hora;
+    if(modeloPorId('voo')) $('modelo').value='voo';
+    preenche(true);
+    var info=$('rezdyInfo'); info.hidden=false;
+    info.textContent = s ? 'Rezdy: voo '+pf.voo+' das '+s.hora+' · '+s.produtos.join(' + ')+' · '+s.pax+' pax · '+s.bookings.length+' reservas ('+s.bookings.map(function(b){return b.order;}).join(', ')+')'+(pf.status?' · status '+pf.status:'')
+                         : 'Voo '+pf.voo+' não encontrado nos voos de hoje da Rezdy'+(hora?'; horário vindo do iPad: '+hora:'')+'. Confira antes de falar.';
+    if(!s) info.style.color='#d93025';
+  })();
   verificaSessao(); /* a chave nunca vem ao navegador; o cookie de sessão é HttpOnly */
 })();
 
