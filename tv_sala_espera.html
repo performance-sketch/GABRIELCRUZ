@@ -54,11 +54,12 @@ header{height:150px;border-bottom:none;padding:0 80px}
 .depois{font-size:30px;color:#a1a1a6}.depois .bl{border-radius:8px}
 .amostra{color:#f5f5f7}
 /* order numbers */
-body.poucos #poucos{grid-template-columns:1fr}
+body.poucos #poucos{grid-template-columns:1fr 760px}
 .hvoo{font-size:240px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums}
-.cd{margin-top:26px}.cdnum{font-size:190px}
-.ords{margin-top:26px}.chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
-.ord{font-size:40px;font-weight:600;letter-spacing:.04em;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 16px;font-variant-numeric:tabular-nums}.chips.mini .ord{font-size:30px;padding:6px 14px}.ord small{font-size:24px;color:#a1a1a6;margin-left:10px;font-weight:500}
+.cd{margin-top:40px}.cdnum{font-size:120px}
+.ords{background:rgba(255,255,255,.04);border-radius:32px;padding:36px 44px;align-self:start}.lista{margin-top:16px}
+.ord{display:flex;align-items:baseline;justify-content:space-between;gap:24px;font-size:44px;font-weight:600;letter-spacing:.04em;padding:14px 0;border-top:1px solid rgba(255,255,255,.08);font-variant-numeric:tabular-nums}.ord:first-child{border-top:none}
+.lista.mini .ord{font-size:32px;padding:8px 0}.ord small{font-size:24px;color:#a1a1a6;font-weight:500;letter-spacing:.02em;white-space:nowrap}
 .prox{margin-top:22px}.pl{display:flex;align-items:center;gap:16px;font-size:24px;color:#d8d4d0;margin-top:8px;white-space:nowrap}.pl b{font-weight:600}.pl .bl{display:inline-block;width:34px;height:22px;border-radius:6px}.pl em{font-style:normal;font-size:16px;letter-spacing:.12em;color:#86868b}.pl .po{font-size:20px;color:#a1a1a6;overflow:hidden;text-overflow:ellipsis}
 
 </style></head><body>
@@ -110,8 +111,8 @@ function render(){cabecalho();const t=TX[lang];
  document.getElementById('rod').textContent=emb?t.rodEmb(emb.voo,t.cor(emb.pulseira)):t.rod;
 }
 // order numbers da Rezdy no proximo voo e nos seguintes
-const chipOrd=b=>`<span class="ord">${b.order}<small>${b.pax} pax${b.status==='CONFIRMED'?'':' · '+b.status.replace('_',' ')}</small></span>`;
-function ordens(v,t){return `<div class="ords"><div class="rot">${t.res} · ${v.bookings.length} · ${v.pax} PAX</div><div class="chips${v.bookings.length>4?' mini':''}">${v.bookings.map(chipOrd).join('')}</div></div>`}
+const chipOrd=b=>`<div class="ord"><span>${b.order}</span><small>${b.pax} pax${b.status==='CONFIRMED'?'':' · '+b.status.replace('_',' ')}</small></div>`;
+function ordens(v,t){return `<div class="ords"><div class="rot">${t.res} · ${v.bookings.length} · ${v.pax} PAX</div><div class="lista${v.bookings.length>6?' mini':''}">${v.bookings.map(chipOrd).join('')}</div></div>`}
 function renderPoucos(f){cabecalho();const t=TX[lang];const el=document.getElementById('poucos');const v=f[0];
  document.getElementById('rod').textContent='';
  if(!v){el.innerHTML=`<div><div class="rot">${t.nada}</div></div>`;return}
@@ -119,8 +120,8 @@ function renderPoucos(f){cabecalho();const t=TX[lang];const el=document.getEleme
  let seg=Math.max(0,Math.round((hm(v.hora)-agora)*60));const h=Math.floor(seg/3600),p2=n=>String(n).padStart(2,'0');
  const cd=(h?h+':':'')+p2(Math.floor(seg%3600/60))+':'+p2(seg%60);
  el.innerHTML=`<div><div class="rot">${t.prox}</div><div class="hvoo">${v.hora}</div>
- ${ordens(v,t)}
- <div class="cd"><div class="rot">${seg>0?t.decEm:t.decAg}</div><div class="cdnum">${cd}</div></div></div>`;
+ <div class="cd"><div class="rot">${seg>0?t.decEm:t.decAg}</div><div class="cdnum">${cd}</div></div></div>
+ ${ordens(v,t)}`;
 }
 marcaOrigem([]); // tudo nesta tela vem da Rezdy
 setTimeout(()=>location.reload(),5*60*1000); // puxa dados novos da Rezdy
