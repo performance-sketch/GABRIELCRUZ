@@ -55,7 +55,8 @@ header{height:150px;border-bottom:none;padding:0 80px}
 .amostra{color:#f5f5f7}
 /* order numbers */
 body.poucos #poucos{grid-template-columns:1fr 760px}
-.info{margin-top:44px;display:flex;flex-direction:column;gap:34px}.stv{font-size:60px;font-weight:600;margin-top:8px;letter-spacing:.01em}.pulv{display:flex;align-items:center;gap:24px;font-size:60px;font-weight:600;margin-top:10px}.pulv .bloco{width:120px;height:72px;border-radius:16px}
+.prod{font-size:56px;font-weight:600;color:#d8d4d0;margin-top:8px;letter-spacing:.01em}
+.info{margin-top:40px;display:flex;flex-direction:column;gap:34px}.stv{font-size:60px;font-weight:600;margin-top:8px;letter-spacing:.01em}.pulv{display:flex;align-items:center;gap:24px;font-size:60px;font-weight:600;margin-top:10px}.pulv .bloco{width:120px;height:72px;border-radius:16px}
 .hvoo{font-size:240px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums}
 .cd{margin-top:40px}.cdnum{font-size:120px}
 .ords{background:rgba(255,255,255,.04);border-radius:32px;padding:36px 44px;align-self:start}.lista{margin-top:16px}
@@ -118,7 +119,7 @@ function renderPoucos(f){cabecalho();const t=TX[lang];const el=document.getEleme
  document.getElementById('rod').textContent='';
  if(!v){el.innerHTML=`<div><div class="rot">${t.nada}</div></div>`;return}
  const mk=param('limpo')?'':'falta';
- el.innerHTML=`<div><div class="rot">${t.prox}</div><div class="hvoo">${v.hora}</div>
+ el.innerHTML=`<div><div class="rot">${t.prox}</div><div class="hvoo">${v.hora}</div><div class="prod">${v.prod}</div>
  <div class="info"><div><div class="rot">${t.h[3]}</div><div class="stv" style="color:${COR_ST[v.st]}">${t.st(v.st)}</div></div>
  <div><div class="rot">${t.pul}</div><div class="pulv"><span class="bloco" style="background:${PULSEIRAS[v.pulseira]};${v.pulseira==='PRETA'?'box-shadow:0 0 0 2px rgba(255,255,255,.35)':''}"></span><span class="${mk}">${t.cor(v.pulseira)}</span></div></div></div></div>
  ${ordens(v,t)}`;
