@@ -1,14 +1,19 @@
 // DADOS REAIS DA REZDY (assets/rezdy_dados.js, gerado a cada 15 min pelo GitHub Actions)
 // O que a Rezdy NAO fornece aparece em vermelho e negrito (classe .falta) e no quadro "NÃO VEM DA REZDY".
 const PULSEIRAS={PRETA:'#1c1c1e',BRANCA:'#f4f2ee',AMARELA:'#f5c400',VERDE:'#2e9d4f'};
-const PULS_ORDEM=['PRETA','BRANCA','AMARELA','VERDE']; // pulseira atribuida em rodizio pelo hub (nao existe na Rezdy)
+const PULS_ORDEM=['PRETA','BRANCA','AMARELA','VERDE']; // pulseira em rodizio pelo hub (nao existe na Rezdy); pode ser trocada na TV escritorio
 const _R=(typeof REZDY!=='undefined')?REZDY:{gerado_em:null,hoje:null,voos_hoje:[],semana:[],mes:{voos:0,horas:0,pax:0}};
 // roteiro = produto(s) Rezdy do horario; ROTEIROS montado a partir deles para manter a mesma estrutura das telas
 const ROTEIROS={};
 // nome curto do produto Rezdy: 'Doors off | 30min (GYG)' -> '30 Doors off'
 function nomeProduto(n){const m=(n||'').match(/(\d+)\s*min/i),on=/doors[\s-]*on/i.test(n);return m?`${m[1]} Doors ${on?'on':'off'}`:n}
+// ajustes manuais (status/pulseira) ficam no navegador; zeram a cada dia porque os codigos VR101... sao refeitos diariamente
+try{if(_R.hoje&&localStorage.getItem('vrhub_dia')!==_R.hoje){localStorage.removeItem('vrhub_status');localStorage.removeItem('vrhub_notas');localStorage.removeItem('vrhub_pulseira');localStorage.setItem('vrhub_dia',_R.hoje)}}catch(e){}
+const pulsOv=()=>{try{return JSON.parse(localStorage.getItem('vrhub_pulseira')||'{}')}catch(e){return{}}};
+function setPulseira(voo,c){try{const o=pulsOv();if(c)o[voo]=c;else delete o[voo];localStorage.setItem('vrhub_pulseira',JSON.stringify(o))}catch(e){}}
+window.addEventListener('storage',e=>{if(e.key==='vrhub_pulseira')location.reload()}); // outra tela mudou a pulseira
 const VOOS=_R.voos_hoje.map((s,i)=>{const rot=s.produtos.join(' + ');ROTEIROS[rot]={nome:rot,min:s.min};
- return{hora:s.hora,voo:'VR'+(101+i),pulseira:PULS_ORDEM[i%4],rot,prod:[...new Set(s.produtos.map(nomeProduto))].join(' + '),pax:s.pax,min:s.min,receita:s.receita,bookings:s.bookings,capacidade:s.capacidade,livres:s.livres}});
+ return{hora:s.hora,voo:'VR'+(101+i),pulseira:pulsOv()['VR'+(101+i)]||PULS_ORDEM[i%4],pulsManual:!!pulsOv()['VR'+(101+i)],rot,prod:[...new Set(s.produtos.map(nomeProduto))].join(' + '),pax:s.pax,min:s.min,receita:s.receita,bookings:s.bookings,capacidade:s.capacidade,livres:s.livres}});
 const hm=s=>{const[a,b]=s.split(':').map(Number);return a*60+b};
 const fmtHM=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(Math.floor(m%60)).padStart(2,'0');
 const param=k=>new URLSearchParams(location.search).get(k);
@@ -23,8 +28,6 @@ const STATUS_TODOS=[...STATUS,'DECOLOU']; // opcoes do seletor manual
 const STATUS_EN={'CONFIRMADO':'CONFIRMED','DECOLOU':'DEPARTED','CHECK-IN ABERTO':'CHECK-IN OPEN','BRIEFING DE SEGURANÇA':'SAFETY BRIEFING','EQUIPANDO':'GEARING UP','EMBARQUE':'BOARDING'};
 // status operacional: automatico pelo horario, sobrescrito pelo iPad (a Rezdy nao tem esse fluxo)
 function statusDe(v,agora){const t=hm(v.hora);if(agora>=t)return'DECOLOU';if(agora>=t-15)return'EMBARQUE';if(agora>=t-30)return'EQUIPANDO';if(agora>=t-45)return'BRIEFING DE SEGURANÇA';if(agora>=t-60)return'CHECK-IN ABERTO';return'CONFIRMADO'}
-// status manual (TV escritorio / iPad) fica no navegador; zera a cada dia porque os codigos VR101... sao refeitos diariamente
-try{if(_R.hoje&&localStorage.getItem('vrhub_dia')!==_R.hoje){localStorage.removeItem('vrhub_status');localStorage.removeItem('vrhub_notas');localStorage.setItem('vrhub_dia',_R.hoje)}}catch(e){}
 function setStatus(voo,st){try{const o=JSON.parse(localStorage.getItem('vrhub_status')||'{}');if(st)o[voo]=st;else delete o[voo];localStorage.setItem('vrhub_status',JSON.stringify(o))}catch(e){}}
 const COR_ST={'CONFIRMADO':'#b7e4c7','CHECK-IN ABERTO':'#f4f2ee','BRIEFING DE SEGURANÇA':'#4fa3ff','EQUIPANDO':'#f07d1a','EMBARQUE':'#f5c400','DECOLOU':'#86dc9b'};
 const COR_ST_CLARO={'CONFIRMADO':'#cdeed8','CHECK-IN ABERTO':'#ebeaea','BRIEFING DE SEGURANÇA':'#a9d0ff','EQUIPANDO':'#ffc48f','EMBARQUE':'#f5c400','DECOLOU':'#86dc9b'};
