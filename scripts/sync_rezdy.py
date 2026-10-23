@@ -1,8 +1,8 @@
 """Busca voos/bookings na Rezdy e gera assets/rezdy_dados.js para o hub.
 
 Uso: REZDY_API_KEY=... python scripts/sync_rezdy.py
-Somente biblioteca padrão. Não grava nome, e-mail ou telefone de clientes, nem valores financeiros
-(o repositório é público).
+Somente biblioteca padrão. Não grava nome, e-mail ou telefone de clientes.
+Valores financeiros só com INCLUIR_VALORES=1 (usado apenas no repositório privado gabrielcruz-teste).
 """
 import json
 import os
@@ -19,6 +19,7 @@ ATIVOS = {"CONFIRMED", "PENDING_SUPPLIER", "PENDING_CUSTOMER", "ON_HOLD", "PROCE
 NAO_VOO = ("gift card", "no-show", "shuttle", "teste")
 SAIDA = os.path.join(os.path.dirname(__file__), "..", "assets", "rezdy_dados.js")
 
+VALORES = os.environ.get("INCLUIR_VALORES") == "1"
 KEY = os.environ.get("REZDY_API_KEY") or os.environ.get("REZDY_KEY")
 if not KEY:
     sys.exit("REZDY_API_KEY não definido")
@@ -70,6 +71,8 @@ slots = defaultdict(lambda: {"produtos": set(), "min": 0, "bookings": []})
 for b in bookings:
     if b.get("status") not in ATIVOS:
         continue
+    pags = b.get("payments") or []
+    cortesia = bool(pags) and all(p.get("type") == "FREE" for p in pags)
     for it in b.get("items", []):
         if not eh_voo(it.get("productName")):
             continue
@@ -79,20 +82,27 @@ for b in bookings:
         s = slots[ini[:16]]
         s["produtos"].add(it.get("productName"))
         s["min"] = max(s["min"], duracao.get(it.get("productCode"), 30))
-        s["bookings"].append({
+        reg = {
             "order": b["orderNumber"],
             "pax": it.get("totalQuantity") or sum(q.get("value", 0) for q in it.get("quantities", [])),
             "status": b["status"],
             "canal": b.get("resellerName") or b.get("source") or "",
-        })
+        }
+        if VALORES:
+            reg["valor"] = 0.0 if cortesia else float(it.get("subtotal") or it.get("amount") or 0)
+            reg["cortesia"] = cortesia
+        s["bookings"].append(reg)
 
 
 def monta(chave, s):
-    return {
+    v = {
         "data": chave[:10], "hora": chave[11:16], "produtos": sorted(s["produtos"]),
         "min": s["min"], "pax": sum(x["pax"] for x in s["bookings"]),
         "bookings": s["bookings"],
     }
+    if VALORES:
+        v["receita"] = round(sum(x["valor"] for x in s["bookings"]), 2)
+    return v
 
 
 todos = [monta(k, slots[k]) for k in sorted(slots)]
