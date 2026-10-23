@@ -37,6 +37,28 @@ def get(endpoint, params):
             time.sleep(5 * (tentativa + 1))
 
 
+def meio(p):
+    """Forma de pagamento de um registro de pagamento da Rezdy."""
+    t, lab = p.get("type"), (p.get("label") or "").lower()
+    if t == "REFUND":
+        return "estorno"
+    if t in ("FREE", "PROMO_CODE", "VOUCHER"):
+        return "desconto"
+    if t == "PAYPAL" or "paypal" in lab:
+        return "paypal"
+    if "stripe" in lab:
+        return "stripe"
+    if t == "CREDITCARD":
+        return "rede"  # maquininha Rede / cartao no terminal
+    if t == "BANKTRANSFER":
+        return "pix"
+    if t == "CASH":
+        return "dinheiro"
+    if p.get("recipient") == "RESELLER":
+        return "ota"  # GetYourGuide etc.: a OTA recebe e repassa menos a comissao
+    return "outros"
+
+
 def eh_voo(nome):
     return not any(x in (nome or "").lower() for x in NAO_VOO)
 
@@ -73,6 +95,11 @@ for b in bookings:
         continue
     pags = b.get("payments") or []
     cortesia = bool(pags) and all(p.get("type") == "FREE" for p in pags)
+    # pagamentos por forma; divididos entre os itens na proporcao do subtotal
+    por_meio = defaultdict(float)
+    for p in pags:
+        por_meio[meio(p)] += float(p.get("amount") or 0)
+    tot_itens = sum(float(i.get("subtotal") or i.get("amount") or 0) for i in b.get("items", [])) or 1.0
     for it in b.get("items", []):
         if not eh_voo(it.get("productName")):
             continue
@@ -89,7 +116,15 @@ for b in bookings:
             "canal": b.get("resellerName") or b.get("source") or "",
         }
         if VALORES:
-            reg["valor"] = 0.0 if cortesia else float(it.get("subtotal") or it.get("amount") or 0)
+            sub = float(it.get("subtotal") or it.get("amount") or 0)
+            k = sub / tot_itens
+            pg = {m: round(x * k, 2) for m, x in por_meio.items() if x}
+            recebido = sum(x for m, x in pg.items() if m not in ("desconto", "estorno")) - pg.get("estorno", 0)
+            reg["subtotal"] = sub
+            reg["pg"] = pg
+            reg["valor"] = round(recebido, 2)  # receita bruta = dinheiro recebido (sem descontos/cortesias, menos estornos)
+            reg["comissao"] = round(float(b.get("commission") or 0) * k, 2) if pg.get("ota") else 0.0
+            reg["a_receber"] = round(max(0.0, float(b.get("totalDue") or 0) * k), 2)
             reg["cortesia"] = cortesia
         s["bookings"].append(reg)
 
